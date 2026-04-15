@@ -2,6 +2,12 @@
 DerivedData/
 .build/
 build/
+
+# TTS sidecar
+sidecar/.venv/
+sidecar/voices/*.wav
+sidecar/voices/*.txt
+!sidecar/voices/.gitkeep
 *.xcworkspace
 xcuserdata/
 *.swp

@@ -45,3 +45,29 @@ targets:
         com.apple.security.app-sandbox: false
         com.apple.security.network.client: true
         com.apple.security.device.audio-input: true
+
+  muttr:
+    type: tool
+    platform: macOS
+    sources:
+      - MuttrCLI
+      - path: Muttr/Models
+      - path: Muttr/App/AppConstants.swift
+      - path: Muttr/Pipeline/Protocols/NarrationProviding.swift
+      - path: Muttr/Pipeline/Protocols/TTSProviding.swift
+      - path: Muttr/Pipeline/Protocols/AudioOutputProviding.swift
+      - path: Muttr/Pipeline/Core/NarrationRouter.swift
+      - path: Muttr/Pipeline/Core/UrgencyClassifier.swift
+      - path: Muttr/Pipeline/Services/OllamaService.swift
+      - path: Muttr/Pipeline/Services/TTSEngine.swift
+      - path: Muttr/Pipeline/Services/AudioService.swift
+      - path: Muttr/Pipeline/Services/SidecarTTSService.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.mattr.muttr.cli
+        PRODUCT_NAME: muttr
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SKIP_INSTALL: NO
+        SWIFT_OBJC_BRIDGING_HEADER: MuttrCLI/MuttrCLI-Bridging-Header.h
+        CLANG_ENABLE_MODULES: YES

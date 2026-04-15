@@ -3,11 +3,17 @@ import Foundation
 final class OllamaService: NarrationProviding, Sendable {
     private let baseURL: URL
     private let modelName: String
+    private let pov: NarrationPOV
     private let session: URLSession
 
-    init(baseURL: URL = AppConstants.ollamaBaseURL, modelName: String = AppConstants.defaultLocalModel) {
+    init(
+        baseURL: URL = AppConstants.ollamaBaseURL,
+        modelName: String = AppConstants.defaultLocalModel,
+        pov: NarrationPOV = .documentary
+    ) {
         self.baseURL = baseURL
         self.modelName = modelName
+        self.pov = pov
 
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30.0 // generous for cold model loads
@@ -80,19 +86,7 @@ final class OllamaService: NarrationProviding, Sendable {
 
     private func buildPrompt(diff: TextDiff) -> String {
         """
-        You are the user's eyes. They are NOT looking at the screen. You are the ONLY way they know what is happening. Dig into the smallest detail of what changed and describe it.
-
-        Voice: a dev muttering to themselves. One sentence, max 20 words.
-
-        NEVER be vague. NEVER say "another change", "something updated", "file modified", or anything generic. Instead:
-        - Name the exact file, function, variable, command, or error you see.
-        - If there's an error, quote the key part of the message.
-        - If code is being written, say what it does.
-        - If a command is running, say which one and its output.
-        - If a build/test is running, say if it passed or failed and why.
-
-        Respond ONLY with: {"narration": "...", "urgency": N}
-        urgency: 1=routine, 2=interesting, 3=noteworthy (errors/warnings), 4=needs input (prompts/y/n)
+        \(pov.systemPrompt)
 
         WHAT JUST APPEARED ON SCREEN:
         \(diff.summary)

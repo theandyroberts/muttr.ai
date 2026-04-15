@@ -3,6 +3,7 @@ import Foundation
 final class CloudAPIService: NarrationProviding, Sendable {
     private let provider: CloudProvider
     private let apiKey: String
+    private let pov: NarrationPOV
     private let session: URLSession
 
     enum CloudProvider: Sendable {
@@ -10,9 +11,10 @@ final class CloudAPIService: NarrationProviding, Sendable {
         case anthropic
     }
 
-    init(provider: CloudProvider, apiKey: String) {
+    init(provider: CloudProvider, apiKey: String, pov: NarrationPOV = .documentary) {
         self.provider = provider
         self.apiKey = apiKey
+        self.pov = pov
 
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = AppConstants.cloudTimeoutSeconds
@@ -35,7 +37,7 @@ final class CloudAPIService: NarrationProviding, Sendable {
     // MARK: - OpenAI
 
     private func generateOpenAI(diff: TextDiff, timeout: TimeInterval) async throws -> NarrationResult {
-        let systemPrompt = Self.systemPrompt
+        let systemPrompt = pov.systemPrompt
         let userPrompt = "What changed on screen:\n\(diff.summary)"
 
         let body: [String: Any] = [
@@ -72,7 +74,7 @@ final class CloudAPIService: NarrationProviding, Sendable {
     // MARK: - Anthropic
 
     private func generateAnthropic(diff: TextDiff, timeout: TimeInterval) async throws -> NarrationResult {
-        let systemPrompt = Self.systemPrompt
+        let systemPrompt = pov.systemPrompt
         let userPrompt = "What changed on screen:\n\(diff.summary)\n\nRespond with only the JSON object."
 
         let body: [String: Any] = [
@@ -106,14 +108,6 @@ final class CloudAPIService: NarrationProviding, Sendable {
     }
 
     // MARK: - Shared
-
-    private static let systemPrompt = """
-        You are Muttr, a developer's screen narrator. You mutter observations about what's happening.
-
-        Respond with JSON: {"narration": "...", "urgency": N}
-        - narration: One sentence, max 20 words. Voice of a slightly bored developer muttering to themselves.
-        - urgency: 1=routine, 2=interesting, 3=noteworthy, 4=needs user input
-        """
 
     static func validateKey(provider: CloudProvider, apiKey: String) async -> Bool {
         let service = CloudAPIService(provider: provider, apiKey: apiKey)
